@@ -37,10 +37,40 @@ query_pairs = '''
 ''' 
 
 
-def get_creatorAddress(data):
-    if(str(data['token00_creator_address']) != 'nan'):
-        return data
-    token_id = data['token00.id']
+query_latest = '''
+{
+ pairs(first: 1000, orderBy: createdAtBlockNumber, orderDirection: desc, where: {createdAtTimestamp_gt:%s}) {
+   id
+   token0{
+    id
+    symbol
+    name
+    txCount
+    totalLiquidity
+    decimals
+  }
+   token1{
+    id
+    symbol
+    name
+    txCount
+    totalLiquidity
+    decimals
+  }
+   reserve0
+   reserve1
+   totalSupply
+   reserveUSD
+   reserveETH
+   txCount
+   createdAtTimestamp
+   createdAtBlockNumber
+ }
+}
+''' 
+
+
+def get_creatorAddress(token_id):
     repos_url = 'https://api.ethplorer.io/getAddressInfo/'+token_id+'?apiKey=EK-4L18F-Y2jC1b7-9qC3N'
     response = requests.get(repos_url).text
     repos = json.loads(response)    #json 형태로 token_id에 해당하는 정보를 불러온다.
@@ -60,7 +90,7 @@ def get_creatorAddress(data):
               print(e)
               creator_address = 'Fail to get Creator Address'
     
-    return data
+    return creator_address
 
 
 def run_query(query):
