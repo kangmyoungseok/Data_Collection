@@ -53,8 +53,24 @@ def get_Creator_ratio(holders,creator_address):
             return holder['share']
     return 0
 
-datas = pd.read_csv('Pairs_v2.3.csv').to_dict('records')
+datas = pd.read_csv('Pairs_v2.3.csv',encoding='utf-8-sig').to_dict('records')
+datas2 = pd.read_csv('Pairs_LPLock_v2.3.csv',encoding='utf-8-sig').to_dict('records')
+len(datas2)
+id_list = []
+for data in datas2:
+    id_list.append(data['id'])
+len(id_list)
 
+datas3 = []
+for i in range(len(datas)):
+    if(datas[i]['id'] in id_list):
+        continue
+    else:
+        datas3.append(datas[i])
+        
+len(datas3)    
+
+datas = datas3
 
 result = []
 error_list = []
