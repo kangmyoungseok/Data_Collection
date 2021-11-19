@@ -18,10 +18,7 @@ def get_holders(token_id):
     repos_url = 'https://api.ethplorer.io/getTopTokenHolders/'+token_id+'?apiKey=EK-4L18F-Y2jC1b7-9qC3N&limit=100'
     response = requests.get(repos_url).text
     repos = json.loads(response)    #json 형태로 token_id에 해당하는 정보를 불러온다.
-    try:
-        return repos['holders']
-    except:
-        return -1
+    return repos['holders']
 
 
 def calc_LP_distribution(holders):
@@ -54,23 +51,23 @@ def get_Creator_ratio(holders,creator_address):
     return 0
 
 datas = pd.read_csv('Pairs_v2.3.csv',encoding='utf-8-sig').to_dict('records')
-datas2 = pd.read_csv('Pairs_LPLock_v2.3.csv',encoding='utf-8-sig').to_dict('records')
-len(datas2)
-id_list = []
-for data in datas2:
-    id_list.append(data['id'])
-len(id_list)
+# datas2 = pd.read_csv('Pairs_LPLock_v2.3.csv',encoding='utf-8-sig').to_dict('records')
+# len(datas2)
+# id_list = []
+# for data in datas2:
+#     id_list.append(data['id'])
+# len(id_list)
 
-datas3 = []
-for i in range(len(datas)):
-    if(datas[i]['id'] in id_list):
-        continue
-    else:
-        datas3.append(datas[i])
+# datas3 = []
+# for i in range(len(datas)):
+#     if(datas[i]['id'] in id_list):
+#         continue
+#     else:
+#         datas3.append(datas[i])
         
-len(datas3)    
+# len(datas3)    
 
-datas = datas3
+# datas = datas3
 
 result = []
 error_list = []
