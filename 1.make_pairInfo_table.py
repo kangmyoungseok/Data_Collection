@@ -19,14 +19,17 @@ cursor = conn.cursor()
 
 ## 테이블 만들기
 sql = '''CREATE TABLE Pair_Info (
-    PairId char(50) NOT NULL PRIMARY KEY,
-    TokenId char(50) NOT NULL,
-    Name varchar(100),
-    Symbol varchar(100),
-    Creator char(50),
-    CreatedAtTimestamp char(15),
-    IsScam Bool,
-    Decimals int
+    id char(50) NOT NULL PRIMARY KEY,
+    token00_id char(50) NOT NULL,
+    token00_name varchar(100),
+    token00_symbol varchar(100),
+    token00_creator char(50),
+    token00_decimals int,
+    reserveETH float,
+    txCount int,
+    createdAtTimestamp char(15),
+    isChange Bool,
+    isScam Bool,
 ) CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 ''' 
 ##
@@ -46,24 +49,28 @@ datas = pd.read_csv('Pairs_v2.3.csv',encoding='utf-8-sig').to_dict('records')
 
 #저장하기 .. 
 sql = '''
-INSERT INTO Pair_INFO(PairId, TokenId, Name, Symbol, Creator, CreatedAtTimestamp, IsScam, Decimals) VALUES(%s,%s,%s,%s,%s,%s,%s,%s)
+INSERT INTO Pair_INFO(id, token00_id, token00_name, token00_symbol, token00_creator, token00_decimals, reserveETH, txCount, createdAtTimestamp, isChange, isScam) VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
 '''
 
 
 for data in datas:
     try:
-        Pair_id = data['id']
-        Token_id = data['token00.id']
-        Name = data['token00.name']
-        Symbol = data['token00.symbol']
-        Creator = data['creator_address']
-        CreatedAtTimestamp = data['createdAtTimestamp']
-        IsScam = False
-        Decimals = data['token00.decimals']
-        cursor.execute(sql,(Pair_id,Token_id,Name,Symbol,Creator,CreatedAtTimestamp,IsScam,Decimals)) 
-    except:
-        print(Pair_id)
-        print(Name)
+        id = data['id']
+        token00_id = data['token00.id']
+        token00_name = data['token00.name']
+        token00_symbol = data['token00.symbol']
+        token00_creator = data['creator_address']
+        token00_decimals = data['token00.decimals']
+        reserveETH = data['reserveETH']
+        txCount = data['txCount']
+        createdAtTimestamp = data['createdAtTimestamp']
+        isChange = False
+        isScam = False
+
+        cursor.execute(sql,(id,token00_id,token00_name,token00_symbol,token00_creator,token00_decimals,reserveETH,txCount,createdAtTimestamp,isChange,isScam)) 
+    except Exception as e:
+        print(e)
+        
 
 conn.commit()
 conn.close() 
