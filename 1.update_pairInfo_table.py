@@ -15,10 +15,16 @@ last_timestamp = result[0][0]
 last_timestamp
 
 # TheGraph에서 일반적인 정보를 먼저 불러오기. 바로 뒤에서 Creator 찾는 코드 돌려야 함
-datas = []
+# DB에 추가하기
+
 query = query_latest % str(last_timestamp)
 result = run_query(query)
 switch_token(result)
+
+sql = '''
+INSERT INTO Pair_INFO(id, token00_id, token00_name, token00_symbol, token00_creator, token00_decimals, reserveETH, txCount, createdAtTimestamp, isChange, isScam) VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+'''
+
 for pair in result['data']['pairs']:
     if((pair['token0']['symbol'] != 'WETH') and (pair['token1']['symbol'] !='WETH' )):
       continue
@@ -26,33 +32,27 @@ for pair in result['data']['pairs']:
       continue
     
     try:
-        pair_id = pair['id']
-        token_id = pair['token00']['id']
-        name = pair['token00']['name']
-        symbol = pair['token00']['symbol']
+
+        id = pair['id']
+        token00_id = pair['token00']['id']
+        token00_name = pair['token00']['name']
+        token00_symbol = pair['token00']['symbol']
+        token00_creator = get_creatorAddress(id)
+        token00_creator = is_proxy(token00_creator, id)  #proxy면 바꾸기
+        token00_decimals = pair['token00']['decimals']
+        reserveETH = pair['reserveETH']
+        txCount = pair['txCount']
         createdAtTimestamp = pair['createdAtTimestamp']
-        decimals = pair['token00']['decimals']
-        creator_address = get_creatorAddress(token_id)
-        datas.append({'id':pair_id, 'token_id' : token_id, 'name' : name, 'symbol':symbol, 'createdAtTimestamp' : createdAtTimestamp,'decimals' : decimals,'creator_address' : creator_address})
+        isChange = False
+        isScam = False
+
+
+        cursor.execute(sql,(id,token00_id,token00_name,token00_symbol,token00_creator,token00_decimals,reserveETH,txCount,createdAtTimestamp,isChange,isScam))
     except:
-        print(pair_id + 'faile')
+        print(id + 'fail')
 
-#datas에 새로 추가된 데이터들 다 넣어 놨으니까 DB에 넣기만 하면 댄다.
 
-#DB에 추가하기
-sql = '''
-INSERT INTO Pair_INFO(PairId, TokenId, Name, Symbol, Creator, CreatedAtTimestamp, IsScam, Decimals) VALUES(%s,%s,%s,%s,%s,%s,%s,%s)
-'''
 
-for data in datas:
-    Pair_id = data['id']
-    Token_id = data['token_id']
-    Name = data['name']
-    Symbol = data['symbol']
-    CreatedAtTimestamp = data['createdAtTimestamp']
-    Decimals = data['decimals']
-    IsScam = False
-    Creator = data['creator_address']
-    cursor.execute(sql,(Pair_id,Token_id,Name,Symbol,Creator,CreatedAtTimestamp,IsScam,Decimals))
+
 conn.commit()
 conn.close() 
